@@ -1,0 +1,14 @@
+{
+	"name": "designcontainer/block-json-parser",
+	"description": "Manage Gutenberg blocks with json files",
+	"type": "wordpress-plugin",
+	"require": {
+		"composer/installers": "^1.9"
+	},
+	"authors": [
+		{
+			"name": "Design Container AS",
+			"homepage": "https://designcontainer.no"
+		}
+	]
+}
