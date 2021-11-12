@@ -350,13 +350,13 @@ class Block_Parser {
 		];
 		// Enqueue block styles if they exist.
 		$css_dist_path = apply_filters('block_json_parser_css_dist_path', '/dist/css/blocks/frontend');
-		if ( file_exists( get_template_directory() . $css_dist_path . '/' . $slug ) ) {
-			$default_args->enqueue_style = get_template_directory_uri() . $css_dist_path . '/' . $slug;
+		if ( file_exists( get_template_directory() . $css_dist_path . '/' . $slug . '.css' ) ) {
+			$default_args->enqueue_style = get_template_directory_uri() . $css_dist_path . '/' . $slug . '.css';
 		}
 		// Enqueue block scripts if they exist.
 		$js_dist_path = apply_filters('block_json_parser_js_dist_path', '/dist/js/blocks');
-		if ( file_exists( get_template_directory() . $js_dist_path . '/' . $slug ) ) {
-			$default_args->enqueue_script = get_template_directory_uri() . $js_dist_path . '/' . $slug;
+		if ( file_exists( get_template_directory() . $js_dist_path . '/' . $slug . '.js' ) ) {
+			$default_args->enqueue_script = get_template_directory_uri() . $js_dist_path . '/' . $slug . '.js';
 		}
 
 		$acf_args = array_merge((array) $default_args, (array) $block_args);
