@@ -267,16 +267,6 @@ class Block_Parser {
 		return array_diff( $post_types, $ignored_wp_post_types );
 	}
 
-    /**
-     * Check if string is SVG.
-     * 
-     * @since 1.0.0
-     * @param boolean $string
-     */
-    private function is_svg($string) {
-        return preg_match('%\b(svg)\b%i', $string);
-    }
-
 	/**
 	 * Modify allowed post types based on the allowed_blocks_per_post_type object.
      * 
@@ -323,18 +313,13 @@ class Block_Parser {
 			throw new ErrorException('acf_register_block_type is not defined!');
 		endif;
 
+		// Set slug.
+		$slug = basename($block);
+
 		// Capitalize, trim, replace dashes and underscores with spaces.
 		$name = ucfirst(trim(preg_replace('/[\-_]/', ' ', $block_args->name)));
 
-		// Handle material icons
-		if ( isset($block_args->icon) && !$this->is_svg($block_args->icon) && function_exists('material_icon') ) :
-			$icon = material_icon($block_args->icon);
-		else:
-			$icon = $block_args->icon;
-		endif;
-		unset($block_args->icon);
-
-		$slug = basename($block);
+		// Set default args.
 		$default_args = (object)[
 			'name'              => $slug,
 			'title'             => $name,
@@ -348,18 +333,26 @@ class Block_Parser {
 				'align' => ['full']
 			],
 		];
+
 		// Enqueue block styles if they exist.
 		$css_dist_path = apply_filters('block_json_parser_css_dist_path', '/dist/css/blocks/frontend');
 		if ( file_exists( get_template_directory() . $css_dist_path . '/' . $slug ) ) {
 			$default_args->enqueue_style = get_template_directory_uri() . $css_dist_path . '/' . $slug;
 		}
+
 		// Enqueue block scripts if they exist.
 		$js_dist_path = apply_filters('block_json_parser_js_dist_path', '/dist/js/blocks');
 		if ( file_exists( get_template_directory() . $js_dist_path . '/' . $slug ) ) {
 			$default_args->enqueue_script = get_template_directory_uri() . $js_dist_path . '/' . $slug;
 		}
 
+		// Merge new block args on top of default args.
 		$acf_args = array_merge((array) $default_args, (array) $block_args);
+
+		// Apply filters to acf args.
+		$acf_args = apply_filters('block_json_parser_block_args', $acf_args);
+
+		// Register block.
 		acf_register_block_type($acf_args);
 	}
 }

@@ -102,3 +102,16 @@ add_filter('block_json_parser_js_dist_path', function() {
     return '/dist/js/blocks'; // Starts from theme root.
 })
 ```
+
+#### Modify block args.
+
+```php
+// Example of handling block icons with a custom function.
+add_filter('block_json_parser_block_args', function($args) {
+    if ( isset( $args['icon'] ) ) :
+		$args['icon'] = material_icon($args['icon']);
+	endif;
+
+	return $args;
+})
+```
