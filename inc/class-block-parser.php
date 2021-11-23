@@ -176,6 +176,7 @@ class Block_Parser {
 		endforeach;
 
 		if ( !isset($blocks_json->allowedBlocks) ) :
+			// If allowedBlocks is no set, we will get all blocks and allow it for that post type.
 			foreach ( $allowed_blocks_per_post_type as $post_type => $domains ) :
 				if ( !isset($blocks_json->allowedBlocks->$post_type) && !isset($blocks_json->allowedBlocks->all) ) :
 					$allowed_blocks_per_post_type->$post_type = array_keys(WP_Block_Type_Registry::get_instance()->get_all_registered());
@@ -320,30 +321,26 @@ class Block_Parser {
 		$name = ucfirst(trim(preg_replace('/[\-_]/', ' ', $block_args->name)));
 
 		// Set default args.
-		$default_args = (object)[
+		$default_args = [
 			'name'              => $slug,
 			'title'             => $name,
 			'description'       => sprintf('%s Gutenberg block', $name),
 			'render_template'   => sprintf('%s/template.php', $block),
-			'icon'              => $icon,
-			'category'          => 'dc',
-			'multiple'          => true,
-			'align'             => 'full',
-			'supports'          => [
-				'align' => ['full']
-			],
+			'multiple'			=> true,
 		];
+		// Apply filters to default args.
+		$default_args = apply_filters('block_json_parser_block_defaults', $default_args);
 
 		// Enqueue block styles if they exist.
 		$css_dist_path = apply_filters('block_json_parser_css_dist_path', '/dist/css/blocks/frontend');
 		if ( file_exists( get_template_directory() . $css_dist_path . '/' . $slug . '.css' ) ) {
-			$default_args->enqueue_style = get_template_directory_uri() . $css_dist_path . '/' . $slug . '.css';
+			$default_args['enqueue_style'] = get_template_directory_uri() . $css_dist_path . '/' . $slug . '.css';
 		}
 
 		// Enqueue block scripts if they exist.
 		$js_dist_path = apply_filters('block_json_parser_js_dist_path', '/dist/js/blocks');
 		if ( file_exists( get_template_directory() . $js_dist_path . '/' . $slug . '.js' ) ) {
-			$default_args->enqueue_script = get_template_directory_uri() . $js_dist_path . '/' . $slug . '.js';
+			$default_args['enqueue_script'] = get_template_directory_uri() . $js_dist_path . '/' . $slug . '.js';
 		}
 
 		// Merge new block args on top of default args.

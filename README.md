@@ -84,7 +84,7 @@ By not specifying a post type or `all`, your post type will have all block types
 ```php
 add_filter('block_json_parser_blocks_path', function() {
     return '/src/blocks'; // Starts from theme root.
-})
+});
 ```
 
 #### Change the default block css dist path.
@@ -92,7 +92,7 @@ add_filter('block_json_parser_blocks_path', function() {
 ```php
 add_filter('block_json_parser_css_dist_path', function() {
     return '/dist/css/blocks/frontend'; // Starts from theme root.
-})
+});
 ```
 
 #### Change the default block js dist path.
@@ -100,7 +100,18 @@ add_filter('block_json_parser_css_dist_path', function() {
 ```php
 add_filter('block_json_parser_js_dist_path', function() {
     return '/dist/js/blocks'; // Starts from theme root.
-})
+});
+```
+
+#### Modify default args.
+
+```php
+// Example of setting a default block category for blocks.
+add_filter('block_json_parser_block_defaults', function($args) {
+    $args['category'] = 'your_category';
+
+	return $args;
+});
 ```
 
 #### Modify block args.
@@ -108,10 +119,10 @@ add_filter('block_json_parser_js_dist_path', function() {
 ```php
 // Example of handling block icons with a custom function.
 add_filter('block_json_parser_block_args', function($args) {
-    if ( isset( $args['icon'] ) ) :
+    if ( isset( $args['icon'] ) && function_exists('material_icon') ) :
 		$args['icon'] = material_icon($args['icon']);
 	endif;
 
 	return $args;
-})
+});
 ```
