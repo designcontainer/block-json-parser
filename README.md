@@ -103,7 +103,7 @@ add_filter('block_json_parser_js_dist_path', function() {
 });
 ```
 
-#### Modify default args.
+#### Modify default block args.
 
 ```php
 // Example of setting a default block category for blocks.
