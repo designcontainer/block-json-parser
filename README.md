@@ -110,7 +110,7 @@ add_filter('block_json_parser_js_dist_path', function() {
 add_filter('block_json_parser_block_defaults', function($args) {
     $args['category'] = 'your_category';
 
-	return $args;
+    return $args;
 });
 ```
 
@@ -120,9 +120,9 @@ add_filter('block_json_parser_block_defaults', function($args) {
 // Example of handling block icons with a custom function.
 add_filter('block_json_parser_block_args', function($args) {
     if ( isset( $args['icon'] ) && function_exists('material_icon') ) :
-		$args['icon'] = material_icon($args['icon']);
-	endif;
+        $args['icon'] = material_icon($args['icon']);
+    endif;
 
-	return $args;
+    return $args;
 });
 ```
