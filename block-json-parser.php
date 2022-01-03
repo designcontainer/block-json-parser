@@ -4,7 +4,7 @@
  * Plugin Name:       Block Json Parser
  * Plugin URI:        https://github.com/designcontainer/block-json-parser
  * Description:       Manage Gutenberg blocks with json files.
- * Version:           1.1.1
+ * Version:           1.1.2
  * Author:            Design Container
  * Author URI:        https://designcontainer.no
  * Text Domain:       block-json-parser
@@ -21,7 +21,7 @@ if (!defined('WPINC')) {
  * Rename this for your plugin and update it as you release new versions.
  */
 if (!defined('BLOCK_JSON_PARSER')) {
-    define('BLOCK_JSON_PARSER', '1.1.1');
+    define('BLOCK_JSON_PARSER', '1.1.2');
 }
 
 /**
@@ -44,4 +44,4 @@ function run_block_json_parser() {
     $block_parser = new Block_Parser(get_template_directory() . $blocks_path);
     $block_parser->run();
 }
-run_block_json_parser();
+add_action('acf/init', 'run_block_json_parser');
