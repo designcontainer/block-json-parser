@@ -136,19 +136,19 @@ Usage example:
 
 ```php
 add_filter('block_json_parser_block_args', function ($args) {
-	if (isset($args['icon']) && function_exists('material_icon')) :
+    if (isset($args['icon']) && function_exists('material_icon')) {
         // This acts as the file name for the cached data
-		$key = $args['icon'] . '.svg';
+        $key = $args['icon'] . '.svg';
 
-		if ($cached_icon = block_json_parser_cache_static($key)) {
-			$args['icon'] =  $cached_icon;
-		} else {
-			$icon_data = material_icon($args['icon']);
+	if ($cached_icon = block_json_parser_cache_static($key)) {
+            $args['icon'] =  $cached_icon;
+        } else {
+            $icon_data = material_icon($args['icon']);
             // This will cache the content and return the data back
-			$args['icon'] = block_json_parser_cache_static($key, $icon_data);
-		}
-	endif;
+            $args['icon'] = block_json_parser_cache_static($key, $icon_data);
+        }
+    }
 	
-	return $args;
+    return $args;
 });
 ```
