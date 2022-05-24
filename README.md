@@ -152,3 +152,6 @@ add_filter('block_json_parser_block_args', function ($args) {
     return $args;
 });
 ```
+
+### Material icons link
+https://fonts.google.com/icons
