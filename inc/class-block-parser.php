@@ -190,7 +190,10 @@ class Block_Parser {
 			$allowed_blocks_per_post_type->all = [];
 			foreach ($blocks_json->allowedBlocks as $post_type => $domains) :
 				foreach ($blocks_json->allowedBlocks->$post_type as $domain => $blocks) :
-					if ($allowed_blocks_per_post_type->$post_type === null) continue;
+					if (
+						! isset( $allowed_blocks_per_post_type->$post_type ) || 
+						$allowed_blocks_per_post_type->$post_type === null
+					) continue;
 					$allowed_blocks_per_post_type->$post_type = array_merge($allowed_blocks_per_post_type->$post_type, $this->get_blocks_per_domain($domain, $blocks));
 				endforeach;
 			endforeach;
