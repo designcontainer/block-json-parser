@@ -86,6 +86,13 @@ add_filter('block_json_parser_blocks_path', function() {
     return '/src/blocks'; // Starts from theme root.
 });
 ```
+#### Change the default Block_Parser when loading from a child theme. This makes the default Block_Parser path relative to the child theme, then adds the primary theme as a secondary Block_Parser path.
+
+```php
+add_filter( 'block_json_parser_has_blocks_in_child_theme', function( bool $has_child_theme_blocks ): bool {
+	return true;
+}, 10, 1 );
+```
 
 #### Change the default block css dist path.
 

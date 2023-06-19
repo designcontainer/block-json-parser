@@ -7,15 +7,27 @@
 class Block_Parser {
 
 	/**
-	 * Absolute path to the blocks directory.
+	 * Relative path to the blocks directory.
 	 *
 	 * @var string
 	 */
 	public $blocks_path;
 
-	public function __construct($blocks_path) {
+	/**
+	 * Relative path to additional directories where acf block files are found.
+	 *
+	 * @since 1.1.4
+	 * @var array
+	 */
+	public $secondary_blocks_paths;
+
+	public function __construct(string $blocks_path, array $secondary_blocks_paths = []) {
 		$this->blocks_path = $blocks_path;
 		$this->allowed_blocks_per_post_type = (object)[];
+
+		if (!empty($secondary_blocks_paths)) {
+			$this->secondary_blocks_paths = $secondary_blocks_paths;
+		}
 
 		if (file_exists($this->blocks_path . '/blocks.json')) :
 			$this->blocks_json = json_decode(file_get_contents($this->blocks_path . '/blocks.json'));
@@ -294,12 +306,18 @@ class Block_Parser {
 	 */
 	private function get_blocks() {
 		$blocks = [];
-		$folders = scandir($this->blocks_path);
-		foreach ($folders as $folder) :
-			$block_path =  $this->blocks_path . '/' . $folder;
-			// Check if block.json exists in folder.
-			if (!file_exists($block_path . '/block.json')) continue;
-			$blocks[] = $block_path;
+		$theme_block_paths = [$this->blocks_path];
+		if (!empty($this->secondary_blocks_paths)) {
+			$theme_block_paths = array_merge($theme_block_paths, $this->secondary_blocks_paths);
+		}
+		foreach ( $theme_block_paths as $theme_block_path ):
+			$folders = scandir($theme_block_path);
+			foreach ($folders as $folder) :
+				$block_path =  $theme_block_path . '/' . $folder;
+				// Check if block.json exists in folder.
+				if (!file_exists($block_path . '/block.json')) continue;
+				$blocks[] = $block_path;
+			endforeach;
 		endforeach;
 
 		return $blocks;
