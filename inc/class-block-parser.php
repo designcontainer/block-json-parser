@@ -21,6 +21,9 @@ class Block_Parser {
 	 */
 	public $secondary_blocks_paths;
 
+	private $allowed_blocks_per_post_type;
+	private $blocks_json;
+
 	public function __construct(string $blocks_path, array $secondary_blocks_paths = []) {
 		$this->blocks_path = $blocks_path;
 		$this->allowed_blocks_per_post_type = (object)[];
