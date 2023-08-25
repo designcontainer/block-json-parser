@@ -67,21 +67,23 @@ class Block_Parser {
 			$this->allowed_blocks_per_post_type = $this->get_globally_allowed_blocks_per_post_type_and_domain($this->blocks_json);
 		endif;
 
-		foreach ($blocks as $block) :
-			// Read and validate json.
-			$block_json = json_decode(file_get_contents($block . '/block.json'));
-			if ($this->validate_block_data($block_json, $block) === false) continue;
-			unset($block_json->parser_version);
+		foreach ($blocks as $theme_block_path => $theme_blocks):
+			foreach ($theme_blocks as $block) :
+				// Read and validate json.
+				$block_json = json_decode(file_get_contents($block . '/block.json'));
+				if ($this->validate_block_data($block_json, $block) === false) continue;
+				unset($block_json->parser_version);
 
-			// Handle allowed post types.
-			if (is_admin() || isset($this->blocks_json->debug) && $this->blocks_json->debug === true) : // No need to run this outside the admin panel / debug mode.
-				$allowed_post_types_for_block = $this->get_allowed_post_types_for_block($block_json);
-				$this->set_allowed_blocks_per_post_type($block_json, $allowed_post_types_for_block);
-			endif;
+				// Handle allowed post types.
+				if (is_admin() || isset($this->blocks_json->debug) && $this->blocks_json->debug === true) : // No need to run this outside the admin panel / debug mode.
+					$allowed_post_types_for_block = $this->get_allowed_post_types_for_block($block_json);
+					$this->set_allowed_blocks_per_post_type($block_json, $allowed_post_types_for_block);
+				endif;
 
-			// Register the block.
-			$this->unset_custom_objects($block_json);
-			$this->register_block($block_json, $block);
+				// Register the block.
+				$this->unset_custom_objects($block_json);
+				$this->register_block($block_json, $block, $theme_block_path);
+			endforeach;
 		endforeach;
 
 		// Debugging
@@ -319,7 +321,10 @@ class Block_Parser {
 				$block_path =  $theme_block_path . '/' . $folder;
 				// Check if block.json exists in folder.
 				if (!file_exists($block_path . '/block.json')) continue;
-				$blocks[] = $block_path;
+				if (empty($blocks[$theme_block_path])) {
+					$blocks[$theme_block_path] = [];
+				}
+				$blocks[$theme_block_path][] = $block_path;
 			endforeach;
 		endforeach;
 
@@ -334,13 +339,20 @@ class Block_Parser {
 	 * @param string $block
 	 * @return void
 	 */
-	private function register_block($block_args, $block) {
+	private function register_block($block_args, $block, string $theme_block_path = '') {
 		if (!function_exists('acf_register_block_type')) :
 			throw new ErrorException('acf_register_block_type is not defined!');
 		endif;
 
 		// Set slug.
 		$slug = basename($block);
+
+		if (empty($theme_block_path)) {
+			$theme_block_path = get_template_directory();
+		}
+		$theme_dir = str_replace('/src/blocks', '', $theme_block_path);
+		$path_parts = explode('wp-content/', $theme_dir);
+		$theme_uri = str_replace($path_parts[0], home_url() . '/', $theme_dir);
 
 		// Capitalize, trim, replace dashes and underscores with spaces.
 		$name = ucfirst(trim(preg_replace('/[\-_]/', ' ', $block_args->name)));
@@ -358,14 +370,14 @@ class Block_Parser {
 
 		// Enqueue block styles if they exist.
 		$css_dist_path = apply_filters('block_json_parser_css_dist_path', '/dist/css/blocks/frontend');
-		if (file_exists(get_template_directory() . $css_dist_path . '/' . $slug . '.css')) {
-			$default_args['enqueue_style'] = get_template_directory_uri() . $css_dist_path . '/' . $slug . '.css';
+		if (file_exists($theme_dir . $css_dist_path . '/' . $slug . '.css')) {
+			$default_args['enqueue_style'] = $theme_uri . $css_dist_path . '/' . $slug . '.css';
 		}
 
 		// Enqueue block scripts if they exist.
 		$js_dist_path = apply_filters('block_json_parser_js_dist_path', '/dist/js/blocks');
-		if (file_exists(get_template_directory() . $js_dist_path . '/' . $slug . '.js')) {
-			$default_args['enqueue_script'] = get_template_directory_uri() . $js_dist_path . '/' . $slug . '.js';
+		if (file_exists($theme_dir . $js_dist_path . '/' . $slug . '.js')) {
+			$default_args['enqueue_script'] = $theme_uri . $js_dist_path . '/' . $slug . '.js';
 		}
 
 		// Merge new block args on top of default args.
