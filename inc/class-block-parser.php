@@ -352,7 +352,12 @@ class Block_Parser {
 		}
 		$theme_dir = str_replace('/src/blocks', '', $theme_block_path);
 		$path_parts = explode('wp-content/', $theme_dir);
-		$theme_uri = str_replace($path_parts[0], home_url() . '/', $theme_dir);
+		
+		$home_url = home_url();
+		$parsed_url = parse_url($home_url);
+		$domain = $parsed_url['scheme'] . '://' . $parsed_url['host'];
+		
+		$theme_uri = str_replace($path_parts[0], $domain . '/', $theme_dir);
 
 		// Capitalize, trim, replace dashes and underscores with spaces.
 		$name = ucfirst(trim(preg_replace('/[\-_]/', ' ', $block_args->name)));
